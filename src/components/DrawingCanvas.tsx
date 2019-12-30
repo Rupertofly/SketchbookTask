@@ -8,31 +8,31 @@ import React, {
 } from 'react';
 
 interface Props {
-  loadDataUrl?: string;
+  loadImageData: ImageData | null;
+  saveHandlerCallback: {
+    addSaveHandle: (handler: () => ImageData) => void;
+    removeSaveHandle: (handler: () => ImageData) => void;
+  };
   size: number;
-}
-function loadImage(
-  canvasContext: CanvasRenderingContext2D,
-  url: string
-) {
-  const img = new Image();
-  img.onload = () => canvasContext.drawImage(img, 0, 0);
-  img.src = url;
 }
 
 function DrawingCanvas({
   size,
-  loadDataUrl,
+  loadImageData,
+  saveHandlerCallback,
 }: Props): ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   let mouseDown = false;
   let canvasContext: CanvasRenderingContext2D;
   useEffect(() => {
-    if (canvasRef.current)
-      canvasContext = canvasRef.current.getContext('2d')!;
-    canvasContext.clearRect(0, 0, size, size);
-    if (loadDataUrl?.length)
-      loadImage(canvasContext, loadDataUrl);
+    if (canvasRef.current) canvasContext = canvasRef.current.getContext('2d')!;
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0, 0, size, size);
+
+    if (loadImageData !== null) canvasContext.putImageData(loadImageData, 0, 0);
+    const handle = () => canvasContext.getImageData(0, 0, size, size);
+    saveHandlerCallback.addSaveHandle(handle);
+    return () => saveHandlerCallback.removeSaveHandle(handle);
   });
   const stamp = (e: MouseEvent) => {
     const brushSize = size / 128;
@@ -40,6 +40,7 @@ function DrawingCanvas({
     e.preventDefault();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
+    canvasContext.fillStyle = 'black';
     canvasContext.beginPath();
     canvasContext.ellipse(
       mouseX,
