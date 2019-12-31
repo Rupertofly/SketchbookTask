@@ -21,7 +21,7 @@ function SideBar({
   newDrawingCallback,
 }: Props): ReactElement {
   return (
-    <div style={{ gridArea: 'sidebar / span 1' }}>
+    <div style={{ gridArea: 'sidebar' }}>
       <NewDrawing callback={newDrawingCallback} />
       <hr />
       <ul>
