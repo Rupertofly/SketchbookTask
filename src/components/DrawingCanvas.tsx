@@ -1,15 +1,8 @@
-import React, {
-  ReactElement,
-  useRef,
-  useEffect,
-  MouseEvent,
-  DragEvent,
-  useState,
-} from 'react';
+import React, { ReactElement, useRef, useEffect, MouseEvent } from 'react';
 
 interface Props {
   loadImageData: ImageData | null;
-  saveHandlerCallback: {
+  saveHelper: {
     addSaveHandle: (handler: () => ImageData) => void;
     removeSaveHandle: (handler: () => ImageData) => void;
   };
@@ -19,28 +12,32 @@ interface Props {
 function DrawingCanvas({
   size,
   loadImageData,
-  saveHandlerCallback,
+  saveHelper,
 }: Props): ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   let mouseDown = false;
   let canvasContext: CanvasRenderingContext2D;
+  const brushSize = size / 128;
+
   useEffect(() => {
     if (canvasRef.current) canvasContext = canvasRef.current.getContext('2d')!;
     canvasContext.fillStyle = 'white';
     canvasContext.fillRect(0, 0, size, size);
 
     if (loadImageData !== null) canvasContext.putImageData(loadImageData, 0, 0);
-    const handle = () => canvasContext.getImageData(0, 0, size, size);
-    saveHandlerCallback.addSaveHandle(handle);
-    return () => saveHandlerCallback.removeSaveHandle(handle);
+    const saveHandler = () => canvasContext.getImageData(0, 0, size, size);
+    saveHelper.addSaveHandle(saveHandler);
+    return () => saveHelper.removeSaveHandle(saveHandler);
   });
-  const stamp = (e: MouseEvent) => {
-    const brushSize = size / 128;
+  const startDrawing = (e: MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
+
     e.preventDefault();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
+
     canvasContext.fillStyle = 'black';
+
     canvasContext.beginPath();
     canvasContext.ellipse(
       mouseX,
@@ -52,20 +49,23 @@ function DrawingCanvas({
       2 * Math.PI
     );
     canvasContext.fill();
+
     mouseDown = true;
   };
-  const draw = (e: MouseEvent) => {
+  const drawWhileMouseDown = (e: MouseEvent) => {
     if (mouseDown) {
-      const brushSize = size / 128;
-      const rect = e.currentTarget.getBoundingClientRect();
       e.preventDefault();
+
+      const rect = e.currentTarget.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
       const prevMouseX = mouseX - e.movementX;
       const prevMouseY = mouseY - e.movementY;
+
       canvasContext.strokeStyle = 'black';
       canvasContext.lineWidth = brushSize * 2;
       canvasContext.lineCap = 'round';
+
       canvasContext.beginPath();
       canvasContext.moveTo(prevMouseX, prevMouseY);
       canvasContext.lineTo(mouseX, mouseY);
@@ -78,8 +78,8 @@ function DrawingCanvas({
       ref={canvasRef}
       width={size}
       height={size}
-      onMouseDown={stamp}
-      onMouseMove={draw}
+      onMouseDown={startDrawing}
+      onMouseMove={drawWhileMouseDown}
       onMouseUp={() => (mouseDown = false)}
       onMouseLeave={() => (mouseDown = false)}
     ></canvas>

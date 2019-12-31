@@ -1,10 +1,10 @@
 import React, { ReactElement, useState } from 'react';
 
 interface Props {
-  newDrawingHandler: (name: string) => void;
+  callback: (name: string) => void;
 }
 
-function NewDrawing({ newDrawingHandler }: Props): ReactElement {
+function NewDrawing({ callback }: Props): ReactElement {
   let [name, setName] = useState('');
   return (
     <form action=''>
@@ -25,7 +25,7 @@ function NewDrawing({ newDrawingHandler }: Props): ReactElement {
         type='button'
         disabled={name.length < 3}
         value='New Drawing'
-        onClick={e => newDrawingHandler(name)}
+        onClick={() => callback(name)}
       />
     </form>
   );
