@@ -72,7 +72,6 @@ function DrawingCanvas({
       canvasContext.stroke();
     }
   };
-
   return (
     <canvas
       style={{ gridArea: 'canvas' }}

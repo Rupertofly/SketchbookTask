@@ -1,15 +1,17 @@
 import React, { ReactElement, useState } from 'react';
 
-interface Props {}
+interface Props {
+  newDrawingHandler: (name: string) => void;
+}
 
-function NewDrawing({}: Props): ReactElement {
+function NewDrawing({ newDrawingHandler }: Props): ReactElement {
   let [name, setName] = useState('');
   return (
     <form action=''>
       <label htmlFor='nameInput'>
         Name:{' '}
         <input
-          onKeyUp={e => setName(e.currentTarget.value)}
+          onInput={e => setName(e.currentTarget.value)}
           type='text'
           minLength={3}
           maxLength={16}
@@ -23,6 +25,7 @@ function NewDrawing({}: Props): ReactElement {
         type='button'
         disabled={name.length < 3}
         value='New Drawing'
+        onClick={e => newDrawingHandler(name)}
       />
     </form>
   );

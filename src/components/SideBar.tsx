@@ -6,16 +6,18 @@ interface Props {
   images: { name: string; data: ImageData }[];
   selectedImage: string;
   selectionHandler: (newSelection: string) => void;
+  newDrawingHandler: (name: string) => void;
 }
 
 function SideBar({
   images,
   selectedImage,
   selectionHandler,
+  newDrawingHandler,
 }: Props): ReactElement {
   return (
     <div style={{ gridArea: 'sidebar / span 1' }}>
-      <NewDrawing />
+      <NewDrawing newDrawingHandler={newDrawingHandler} />
       <hr />
       <ul>
         {images.map((image, index) => {

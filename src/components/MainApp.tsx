@@ -13,6 +13,7 @@ function MainApp({}: Props): ReactElement {
     { name: 'Drawing 1', data: new ImageData(1, 1) },
     { name: 'Drawing 2', data: new ImageData(1, 1) },
   ]);
+
   const saveFunction = (data: ImageData) => {};
   const handleLoad = () => {};
   let imageSize = 512;
@@ -44,6 +45,16 @@ function MainApp({}: Props): ReactElement {
     );
     return canvasImageData;
   };
+
+  const newDrawing = (name: string) => {
+    if (images.find(drawing => drawing.name === name)) {
+      alert(`There is already a drawing named ${name}`);
+      return;
+    }
+    setImages([...images, { name, data: new ImageData(10, 10) }]);
+    selectDrawing(name);
+  };
+
   const maximumCanvasSize = Math.min(
     window.innerHeight,
     2 * (window.innerWidth / 3)
@@ -71,6 +82,7 @@ function MainApp({}: Props): ReactElement {
           images={images}
           selectedImage={selectedDrawing}
           selectionHandler={selectDrawingHandler}
+          newDrawingHandler={newDrawing}
         />
         <DrawingCanvas
           size={imageSize}
