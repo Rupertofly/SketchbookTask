@@ -1,21 +1,16 @@
-import React, { ReactElement, useState, CSSProperties } from 'react';
-import '../styles.css';
+import React, { ReactElement } from 'react';
 
 interface Props {
   name: string;
-  active: Boolean;
-  selectionHandler: (newSelection: string) => void;
+  isActive: Boolean;
+  callback: (newSelection: string) => void;
 }
 
-function DrawingListItem({
-  name,
-  active,
-  selectionHandler,
-}: Props): ReactElement {
+function DrawingListItem({ name, isActive, callback }: Props): ReactElement {
   return (
     <li
-      className={`drawingItem ${active ? 'active' : ''}`}
-      onClick={() => selectionHandler(name)}
+      className={`drawingItem ${isActive ? 'active' : ''}`}
+      onClick={() => callback(name)}
     >
       {name}
     </li>
