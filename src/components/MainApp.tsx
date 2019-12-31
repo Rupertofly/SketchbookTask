@@ -1,24 +1,19 @@
 import React, { ReactElement, CSSProperties, useState } from 'react';
 import SideBar from './SideBar';
 import DrawingCanvas from './DrawingCanvas';
-
+type Drawing = {
+  name: string;
+  data: ImageData;
+};
 interface Props {}
 function MainApp({}: Props): ReactElement {
-  let [images, setImages] = useState<
-    Array<{
-      name: string;
-      data: ImageData;
-    }>
-  >([
+  const [images, setImages] = useState([
     { name: 'Drawing 1', data: new ImageData(1, 1) },
-    { name: 'Drawing 2', data: new ImageData(1, 1) },
-  ]);
-
-  const saveFunction = (data: ImageData) => {};
-  const handleLoad = () => {};
-  let imageSize = 512;
+  ] as Drawing[]);
   const defaultDrawingName = 'Drawing 1';
-  let [selectedDrawing, selectDrawing] = useState(defaultDrawingName);
+  const [selectedDrawing, selectDrawing] = useState(defaultDrawingName);
+  let imageSize = 512;
+
   const selectDrawingHandler = (newSelection: string) => {
     save();
     selectDrawing(newSelection);
@@ -36,13 +31,16 @@ function MainApp({}: Props): ReactElement {
   const save = () => {
     const canvasImageData = saveHandlers.map(handler => handler()).pop();
     if (!canvasImageData) throw new Error(`canvas provided no data`);
-    setImages(
-      images.map(({ name, data }) =>
-        name === selectedDrawing
-          ? { name, data: canvasImageData }
-          : { name, data }
-      )
-    );
+    const newImages: Drawing[] = images.map(drawing => {
+      if (drawing.name === selectedDrawing) {
+        console.log(`saved`);
+
+        return { name: drawing.name, data: canvasImageData };
+      } else {
+        return { name: drawing.name, data: drawing.data };
+      }
+    });
+    setImages(newImages);
     return canvasImageData;
   };
 
@@ -51,7 +49,16 @@ function MainApp({}: Props): ReactElement {
       alert(`There is already a drawing named ${name}`);
       return;
     }
-    setImages([...images, { name, data: new ImageData(10, 10) }]);
+    const canvasImageData = saveHandlers.map(handler => handler()).pop();
+    if (!canvasImageData) throw new Error(`canvas provided no data`);
+    const newImages: Drawing[] = images.map(drawing => {
+      if (drawing.name === selectedDrawing) {
+        return { name: drawing.name, data: canvasImageData };
+      } else {
+        return { name: drawing.name, data: drawing.data };
+      }
+    });
+    setImages([...newImages, { name, data: new ImageData(1, 1) }]);
     selectDrawing(name);
   };
 
@@ -75,7 +82,7 @@ function MainApp({}: Props): ReactElement {
           console.log(images[0].data.data);
         }}
       >
-        App {imageSize}
+        Sketching App by Ruby Quail
       </h1>
       <div style={{ ...appStyling }}>
         <SideBar
